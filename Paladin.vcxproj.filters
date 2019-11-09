@@ -1,0 +1,158 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="align.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="blast.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="bntseq.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="bwa.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="bwamem.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="bwamem_extra.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="bwamem_pair.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="bwashm.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="bwt.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="bwtindex.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="is.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="kopen.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="kstring.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ksw.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="kthread.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="main.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="malloc_wrap.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="pemerge.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="protein.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="translations.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="uniprot.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="utils.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="zlib\lib\zlib.def">
+      <Filter>Source Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="align.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="blast.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="bntseq.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="bwa.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="bwamem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="bwt.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="bwtindex.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="kbtree.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="khash.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="kseq.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ksort.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="kstring.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ksw.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="kvec.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="main.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="malloc_wrap.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="protein.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="translations.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="uniprot.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="utils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zlib.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="zconf.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
