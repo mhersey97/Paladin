@@ -11,8 +11,8 @@ void renderBLASTReport(FILE * passStream, const char * passProxy) {
     char commonHeader[] = "qSeqId\tsSeqId\tpIdent\tlength\tmismatch\tgapOpen\tqStart\tqEnd\tsStart\tsEnd\teValue\tbitScore"; // headers for the full blast tabular format
 
     // Report no data
-    globalLists = getGlobalLists(passPrimary);
-    if (true/*globalLists[0].entryCount == 0*/) { // always true for now as we are just making dummy code
+    //globalLists = getGlobalLists(passPrimary);
+    if (1/*globalLists[0].entryCount == 0*/) { // always true for now as we are just making dummy code
         fprintf(passStream, "No entries to report\n");
         return;
     }
