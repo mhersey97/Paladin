@@ -1,12 +1,14 @@
-
-
-
-
+#include <stdlib.h>
+#include <string.h>
+#include <errno.h>
+#include <curl/curl.h>
+#include <unistd.h>
+#include <zlib.h>
 
 
 void renderBLASTReport(FILE * passStream, const char * passProxy) {
     //UniprotList * globalLists;
-    char commonHeader[] = "qSeqId\sSeqId\pIdent\length\mismatch\gapOpen\qStart\qEnd\sStart\sEnd\eValue\bitScore"; // headers for the full blast tabular format
+    char commonHeader[] = "qSeqId\tsSeqId\tpIdent\tlength\tmismatch\tgapOpen\tqStart\tqEnd\tsStart\tsEnd\teValue\tbitScore"; // headers for the full blast tabular format
 
     // Report no data
     globalLists = getGlobalLists(passPrimary);
