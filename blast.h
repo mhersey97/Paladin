@@ -4,3 +4,5 @@
 
 // rendering
 void renderBLASTReport(FILE * passStream, const char * passProxy);
+
+#endif
