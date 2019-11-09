@@ -119,7 +119,7 @@ int command_align(int argc, char *argv[]) {
 	memset(&opt0, 0, sizeof(mem_opt_t));
     proxyAddress = NULL;
 
-	while ((c = getopt(argc, argv, "1epabgnMCSVYJjf:F:z:u:k:o:c:v:s:r:t:R:A:B:O:E:U:w:L:d:T:Q:D:m:I:N:W:x:G:h:y:K:X:H:P:")) >= 0) {
+	while ((c = getopt(argc, argv, "1epabgnMCSVYJjf:F:z:u:k:o:c:v:s:r:t:R:A:B:O:E:U:w:L:d:T:Q:D:m:I:N:W:x:G:h:y:K:X:H:P:l:")) >= 0) {
 		if (c == 'k') opt->min_seed_len = atoi(optarg), opt0.min_seed_len = 1;
 		else if (c == 'u') opt->outputType = atoi(optarg);
 		else if (c == 'f') opt->min_orf_len = atoi(optarg);
