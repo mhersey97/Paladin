@@ -344,7 +344,12 @@ int command_align(int argc, char *argv[]) {
 		reportPriName = malloc(strlen(prefixName) + 23);
 		reportSecName = malloc(strlen(prefixName) + 23);
 		sprintf(samName, "%s.sam", prefixName);
-		sprintf(reportPriName, "%s_uniprot.tsv", prefixName);
+  if (opt->flag & MEM_F_BLAST) {
+    sprintf(reportPriName, "%s_blast.tsv", prefixName);
+  }
+  else{
+		  sprintf(reportPriName, "%s_uniprot.tsv", prefixName);
+  }
 
 		if (opt->flag & MEM_F_ALL) {
 			sprintf(reportPriName, "%s_uniprot_primary.tsv", prefixName);
