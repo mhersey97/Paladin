@@ -126,7 +126,10 @@ int command_align(int argc, char *argv[]) {
 		else if (c == 'F') opt->min_orf_percent = atof(optarg);
         else if (c == 'z') opt->translations = convertTransArgs(optarg);
 		else if (c == 'o') prefixName = optarg; // writing to prefixName file
-  else if (c == 'l') opt->flag |= MEM_F_BLAST; // blast tabular output selected
+  else if (c == 'l') {
+    opt->flag |= MEM_F_BLAST; // blast tabular output selected
+    prefixName = optarg;
+  }
 		else if (c == '1') no_mt_io = 1;
 		else if (c == 'x') mode = optarg;
 		else if (c == 'w') opt->w = atoi(optarg), opt0.w = 1;

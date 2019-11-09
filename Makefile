@@ -57,3 +57,4 @@ protein.o: protein.h translations.h utils.h kseq.h malloc_wrap.h khash.h
 translations.o: translations.h 
 utils.o: utils.h ksort.h malloc_wrap.h kseq.h
 uniprot.o: uniprot.h
+blast.o: blast.h
