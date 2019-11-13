@@ -56,12 +56,14 @@ static void *process(void *shared, int step, void *_data) {
 				mem_process_seqs(&tmp_opt, idx->bwt, idx->bns, idx->pac, aux->n_processed, n_sep[0], sep[0], 0);
 				for (i = 0; i < n_sep[0]; ++i)
 					data->seqs[sep[0][i].id].sam = sep[0][i].sam;
+                    data->seqs[sep[0][i].id].blast = sep[0][i].blast;
 			}
 			if (n_sep[1]) {
 				tmp_opt.flag |= MEM_F_PE;
 				mem_process_seqs(&tmp_opt, idx->bwt, idx->bns, idx->pac, aux->n_processed + n_sep[0], n_sep[1], sep[1], aux->pes0);
 				for (i = 0; i < n_sep[1]; ++i)
 					data->seqs[sep[1][i].id].sam = sep[1][i].sam;
+                    data->seqs[sep[1][i].id].blast = sep[1][i].blast;
 			}
 			free(sep[0]); free(sep[1]);
 		} else mem_process_seqs(opt, idx->bwt, idx->bns, idx->pac, aux->n_processed, data->n_seqs, data->seqs, aux->pes0);
@@ -70,9 +72,16 @@ static void *process(void *shared, int step, void *_data) {
 		return data;
 	} else if (step == 2) {
 		for (i = 0; i < data->n_seqs; ++i) {
-			if (data->seqs[i].sam) err_fputs(data->seqs[i].sam, opt->outputStream);
+			if (data->seqs[i].sam && !(opt->flag & MEM_F_BLAST)){
+                err_fputs(data->seqs[i].sam, opt->outputStream);
+            }
+            else if (data->seqs[i].blast && (opt->flag & MEM_F_BLAST)){
+                err_fputs(data->seqs[i].blast, opt->outputStream);
+                //free(data->seqs[i].blast);
+            }
 			free(data->seqs[i].name); free(data->seqs[i].comment);
 			free(data->seqs[i].seq); free(data->seqs[i].qual); free(data->seqs[i].sam);
+            free(data->seqs[i].blast);
 		}
 		free(data->seqs); free(data);
 
@@ -119,17 +128,17 @@ int command_align(int argc, char *argv[]) {
 	memset(&opt0, 0, sizeof(mem_opt_t));
     proxyAddress = NULL;
 
-	while ((c = getopt(argc, argv, "1epabgnMCSVYJjf:F:z:u:k:o:c:v:s:r:t:R:A:B:O:E:U:w:L:d:T:Q:D:m:I:N:W:x:G:h:y:K:X:H:P:l:")) >= 0) {
+	while ((c = getopt(argc, argv, "1epabgnMlCSVYJjf:F:z:u:k:o:c:v:s:r:t:R:A:B:O:E:U:w:L:d:T:Q:D:m:I:N:W:x:G:h:y:K:X:H:P:")) >= 0) {
 		if (c == 'k') opt->min_seed_len = atoi(optarg), opt0.min_seed_len = 1;
 		else if (c == 'u') opt->outputType = atoi(optarg);
 		else if (c == 'f') opt->min_orf_len = atoi(optarg);
 		else if (c == 'F') opt->min_orf_percent = atof(optarg);
         else if (c == 'z') opt->translations = convertTransArgs(optarg);
 		else if (c == 'o') prefixName = optarg; // writing to prefixName file
-  else if (c == 'l') {
-    opt->flag |= MEM_F_BLAST; // blast tabular output selected
-    prefixName = optarg;
-  }
+        else if (c == 'l') {
+            opt->flag |= MEM_F_BLAST; // blast tabular output selected
+            //prefixName = optarg;
+        }
 		else if (c == '1') no_mt_io = 1;
 		else if (c == 'x') mode = optarg;
 		else if (c == 'w') opt->w = atoi(optarg), opt0.w = 1;
@@ -344,12 +353,7 @@ int command_align(int argc, char *argv[]) {
 		reportPriName = malloc(strlen(prefixName) + 23);
 		reportSecName = malloc(strlen(prefixName) + 23);
 		sprintf(samName, "%s.sam", prefixName);
-  if (opt->flag & MEM_F_BLAST) {
-    sprintf(reportPriName, "%s_blast.tsv", prefixName);
-  }
-  else{
-		  sprintf(reportPriName, "%s_uniprot.tsv", prefixName);
-  }
+		sprintf(reportPriName, "%s_uniprot.tsv", prefixName);
 
 		if (opt->flag & MEM_F_ALL) {
 			sprintf(reportPriName, "%s_uniprot_primary.tsv", prefixName);
@@ -397,7 +401,7 @@ int command_align(int argc, char *argv[]) {
 	}
 
 	// Render SAM header
-	if (!(opt->flag & MEM_F_ALN_REG)) {
+	if (!(opt->flag & MEM_F_ALN_REG) && !(opt->flag & MEM_F_BLAST)) {
 		bwa_print_sam_hdr(aux.idx->bns, hdr_line, opt->outputStream);
 	}
 
@@ -410,15 +414,10 @@ int command_align(int argc, char *argv[]) {
 
 	// Generate UniProt report if requested
 	if (prefixName != NULL) {
-  if (opt->flag & MEM_F_BLAST) {
-    renderBLASTReport(reportPriStream, proxyAddress);
-  }
-  else{
 		 renderUniprotReport(opt->outputType, 1, reportPriStream, proxyAddress);
-   if (opt->flag & MEM_F_ALL) {
-    renderUniprotReport(opt->outputType, 0, reportSecStream, proxyAddress);
-   }
-  }
+        if (opt->flag & MEM_F_ALL) {
+            renderUniprotReport(opt->outputType, 0, reportSecStream, proxyAddress);
+        }
 	}
 
 	// Delete generated protein file unless requested otherwise
@@ -460,7 +459,7 @@ int renderAlignUsage(const mem_opt_t * passOptions) {
 	fprintf(stderr, "       -J            do not adjust minimum ORF length (constant value) for shorter read lengths\n");
 	fprintf(stderr, "       -f INT        minimum ORF length accepted (as constant value) [%d]\n", passOptions->min_orf_len);
 	fprintf(stderr, "       -F FLOAT      minimum ORF length accepted (as percentage of read length) [%.2f]\n", passOptions->min_orf_percent);
-    fprintf(stderr, "       -z INT[,...]  Genetic code used for translation (-z ? for full list) [1]\n");    
+    fprintf(stderr, "       -z INT[,...]  Genetic code used for translation (-z ? for full list) [1]\n");
 
 
 	fprintf(stderr, "\nAlignment options:\n\n");
@@ -502,6 +501,7 @@ int renderAlignUsage(const mem_opt_t * passOptions) {
     fprintf(stderr, "       -P STR        HTTP or SOCKS proxy address\n");
 	fprintf(stderr, "       -g            generate detected ORF nucleotide sequence FASTA\n");
 	fprintf(stderr, "       -n            keep protein sequence after alignment\n");
+    fprintf(stderr, "       -l            use BLASTn tabular output\n");
 	//fprintf(stderr, "       -p            smart pairing (ignoring in2.fq)\n");
 	fprintf(stderr, "       -R STR        read group header line such as '@RG\\tID:foo\\tSM:bar' [null]\n");
 	fprintf(stderr, "       -H STR/FILE   insert STR to header if it starts with @; or insert lines in FILE [null]\n");
