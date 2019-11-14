@@ -19,6 +19,32 @@ void renderBLASTReport(FILE * passStream, const char * passProxy) {
 }
 
 void mem_aln2blast(const mem_opt_t *opt, const bntseq_t *bns, kstring_t *str, bseq1_t *s, int n, const mem_aln_t *list, int which, const mem_aln_t *m_) {
-    kputs("qSeqId\tsSeqId\tpIdent\tlength\tmismatch\tgapOpen\tqStart\tqEnd\tsStart\tsEnd\teValue\tbitScore\n", str);
+    //copying stuff from mem_aln2sam since some of it is necessary, possibly not all of it
+    //to be trimmed down
+    int i, l_name;
+	mem_aln_t ptmp = list[which], *p = &ptmp, mtmp, *m = 0; // make a copy of the alignment to convert
+	if (m_) mtmp = *m_, m = &mtmp;
+
+	// set flag
+	p->flag |= m? 0x1 : 0; // is paired in sequencing
+	p->flag |= p->rid < 0? 0x4 : 0; // is mapped
+	p->flag |= m && m->rid < 0? 0x8 : 0; // is mate mapped
+	if (p->rid < 0 && m && m->rid >= 0) // copy mate to alignment
+		p->rid = m->rid, p->pos = m->pos, p->is_rev = m->is_rev, p->n_cigar = 0;
+	if (m && m->rid < 0 && p->rid >= 0) // copy alignment to mate
+		m->rid = p->rid, m->pos = p->pos, m->is_rev = p->is_rev, m->n_cigar = 0;
+	p->flag |= p->is_rev? 0x10 : 0; // is on the reverse strand
+	p->flag |= m && m->is_rev? 0x20 : 0; // is mate on the reverse strand
+
+    l_name = strlen(s->name);
+	ks_resize(str, str->l + s->l_seq + l_name + (s->qual? s->l_seq : 0) + 20);
+	kputsn(s->name, l_name, str); kputc('\t', str); // qseqid
+    if (p->rid >= 0) { // with coordinate
+        kputs(bns->anns[p->rid].name, str); kputc('\t', str); // tseqid
+    } else {
+        kputc('*', str);
+        kputc('\t', str);
+    }
+    kputs("pIdent\tlength\tmismatch\tgapOpen\tqStart\tqEnd\tsStart\tsEnd\teValue\tbitScore\n", str);
 
 }
