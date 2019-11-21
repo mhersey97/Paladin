@@ -40,11 +40,24 @@ void mem_aln2blast(const mem_opt_t *opt, const bntseq_t *bns, kstring_t *str, bs
 	ks_resize(str, str->l + s->l_seq + l_name + (s->qual? s->l_seq : 0) + 20);
 	kputsn(s->name, l_name, str); kputc('\t', str); // qseqid
     if (p->rid >= 0) { // with coordinate
-        kputs(bns->anns[p->rid].name, str); kputc('\t', str); // tseqid
+        kputs(bns->anns[p->rid].name, str); kputc('\t', str); // sseqid
     } else {
-        kputc('*', str);
-        kputc('\t', str);
+        kputs("*\t", str);
     }
-    kputs("pIdent\tlength\tmismatch\tgapOpen\tqStart\tqEnd\tsStart\tsEnd\teValue\tbitScore\n", str);
+    kputs("pIdent\tlength\tmismatch\t", str);
+    int gap_count = 0;
+    if(p->rid >= 0) { // with coordinate
+        if (p->n_cigar) { // aligned
+			for (i = 0; i < p->n_cigar; ++i) {
+				int c = p->cigar[i]&0xf;
+				if (!(opt->flag&MEM_F_SOFTCLIP) && !p->is_alt && (c == 3 || c == 4))
+					c = which? 4 : 3; // use hard clipping for supplementary alignments
+                if( c == 1 || c == 2)
+                    gap_count++;
+			}
+		}
+    }
+    kputw(gap_count, str); kputc('\t', str);
+    kputs("qStart\tqEnd\tsStart\tsEnd\teValue\tbitScore\n", str);
 
 }
