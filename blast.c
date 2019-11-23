@@ -8,7 +8,7 @@
 
 void renderBLASTReport(FILE * passStream, const char * passProxy) {
     //UniprotList * globalLists;
-    char commonHeader[] = "qSeqId\tsSeqId\tpIdent\tlength\tmismatch\tgapOpen\tqStart\tqEnd\tsStart\tsEnd\teValue\tbitScore"; // headers for the full blast tabular format
+    //char commonHeader[] = "qSeqId\tsSeqId\tpIdent\tlength\tmismatch\tgapOpen\tqStart\tqEnd\tsStart\tsEnd\teValue\tbitScore"; // headers for the full blast tabular format
 
     // Report no data
     //globalLists = getGlobalLists(passPrimary);
@@ -44,8 +44,11 @@ void mem_aln2blast(const mem_opt_t *opt, const bntseq_t *bns, kstring_t *str, bs
     } else {
         kputs("*\t", str);
     }
-    kputs("pIdent\tlength\tmismatch\t", str);
-    int gap_count = 0;
+    kputs("pIdent\t", str);
+    int gap_count = 0; //gapopen = count of I and D in CIGAR string
+    int soft_clips = 0; //soft clips sum used to calculate length
+    int query_length = s->l_seq;
+    int length = query_length - soft_clips;
     if(p->rid >= 0) { // with coordinate
         if (p->n_cigar) { // aligned
 			for (i = 0; i < p->n_cigar; ++i) {
@@ -54,10 +57,28 @@ void mem_aln2blast(const mem_opt_t *opt, const bntseq_t *bns, kstring_t *str, bs
 					c = which? 4 : 3; // use hard clipping for supplementary alignments
                 if( c == 1 || c == 2)
                     gap_count++;
+                if( c == 3 ) {
+                    soft_clips+= p->cigar[i]>>4;
+                }
 			}
 		}
+        kputw( length , str); kputc('\t', str);//length
+        kputs("mismatch\t", str);
+        kputw(gap_count, str); kputc('\t', str); //gapopen
+    } else {
+        kputs("*\t*\t*\t", str);
     }
-    kputw(gap_count, str); kputc('\t', str);
-    kputs("qStart\tqEnd\tsStart\tsEnd\teValue\tbitScore\n", str);
+
+
+    kputs("qStart\tqEnd\t", str);
+    if( p->rid >= 0) {
+
+        long sstart = p->pos + 1;
+        kputl(sstart, str); kputc('\t', str); //sstart
+        kputl( sstart + length, str); kputc('\t', str); //ssend
+    } else {
+        kputs("*\t*\t", str);
+    }
+    kputs("eValue\tbitScore\n", str);
 
 }
