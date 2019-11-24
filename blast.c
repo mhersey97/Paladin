@@ -38,7 +38,7 @@ void mem_aln2blast(const mem_opt_t *opt, const bntseq_t *bns, kstring_t *str, bs
 
     l_name = strlen(s->name);
 	ks_resize(str, str->l + s->l_seq + l_name + (s->qual? s->l_seq : 0) + 20);
-	kputsn(s->name, l_name, str); kputc('\t', str); // qseqid
+	kputs(qseqid(s->name), str); kputc('\t', str); // qseqid
     if (p->rid >= 0) { // with coordinate
         kputs(bns->anns[p->rid].name, str); kputc('\t', str); // sseqid
     } else {
@@ -47,6 +47,7 @@ void mem_aln2blast(const mem_opt_t *opt, const bntseq_t *bns, kstring_t *str, bs
     kputs("pIdent\t", str);
     int gap_count = 0; //gapopen = count of I and D in CIGAR string
     int soft_clips = 0; //soft clips sum used to calculate length
+    int left_clips = 0;
     int query_length = s->l_seq;
     int length = query_length - soft_clips;
     if(p->rid >= 0) { // with coordinate
@@ -60,6 +61,9 @@ void mem_aln2blast(const mem_opt_t *opt, const bntseq_t *bns, kstring_t *str, bs
                 if( c == 3 ) {
                     soft_clips+= p->cigar[i]>>4;
                 }
+                if( i == 0 && c == 3){
+                    left_clips = p->cigar[i]>>4;
+                }
 			}
 		}
         kputw( length , str); kputc('\t', str);//length
@@ -70,15 +74,35 @@ void mem_aln2blast(const mem_opt_t *opt, const bntseq_t *bns, kstring_t *str, bs
     }
 
 
-    kputs("qStart\tqEnd\t", str);
     if( p->rid >= 0) {
-
+        kputw( left_clips, str); kputc('\t', str); //qStart
+        kputw( query_length + soft_clips, str); kputc('\t', str); //qEnd
         long sstart = p->pos + 1;
         kputl(sstart, str); kputc('\t', str); //sstart
-        kputl( sstart + length, str); kputc('\t', str); //ssend
+        kputl( sstart + length -1, str); kputc('\t', str); //ssend
     } else {
-        kputs("*\t*\t", str);
+        kputs("*\t*\t*\t*\t", str);
     }
     kputs("eValue\tbitScore\n", str);
 
+}
+
+char* qseqid( char* name) {
+    int trim = 0;
+    int colon_count = 0;
+    int old_length = strlen(name);
+    for( int i = 0; i < old_length ; i++) {
+        if(name[i] == ':'){
+            colon_count++;
+        }
+        if( colon_count == 3){
+            trim = i;
+            break;
+        }
+    }
+    char *dest = (char*)malloc(sizeof(char) * (old_length - trim));
+    for(int i = 0; i < old_length - trim; i++) {
+        dest[i] = name[i+trim+1];
+    }
+    return dest;
 }

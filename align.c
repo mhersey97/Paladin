@@ -77,7 +77,6 @@ static void *process(void *shared, int step, void *_data) {
             }
             else if (data->seqs[i].blast && (opt->flag & MEM_F_BLAST)){
                 err_fputs(data->seqs[i].blast, opt->outputStream);
-                //free(data->seqs[i].blast);
             }
 			free(data->seqs[i].name); free(data->seqs[i].comment);
 			free(data->seqs[i].seq); free(data->seqs[i].qual); free(data->seqs[i].sam);
