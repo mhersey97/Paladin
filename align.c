@@ -79,8 +79,11 @@ static void *process(void *shared, int step, void *_data) {
                 err_fputs(data->seqs[i].blast, opt->outputStream);
             }
 			free(data->seqs[i].name); free(data->seqs[i].comment);
-			free(data->seqs[i].seq); free(data->seqs[i].qual); free(data->seqs[i].sam);
-            free(data->seqs[i].blast);
+			free(data->seqs[i].seq); free(data->seqs[i].qual);
+            if(data->seqs[i].sam)
+                free(data->seqs[i].sam);
+            if(data->seqs[i].blast)
+                free(data->seqs[i].blast);
 		}
 		free(data->seqs); free(data);
 

@@ -69,18 +69,13 @@ void mem_aln2blast(const mem_opt_t *opt, const bntseq_t *bns, kstring_t *str, bs
         kputw( length , str); kputc('\t', str);//length
         kputs("mismatch\t", str);
         kputw(gap_count, str); kputc('\t', str); //gapopen
-    } else {
-        kputs("*\t*\t*\t", str);
-    }
-
-
-    if( p->rid >= 0) {
         kputw( left_clips, str); kputc('\t', str); //qStart
-        kputw( query_length + soft_clips, str); kputc('\t', str); //qEnd
+        kputw( (query_length + left_clips) * 3, str); kputc('\t', str); //qEnd uses nucleotide length
         long sstart = p->pos + 1;
         kputl(sstart, str); kputc('\t', str); //sstart
         kputl( sstart + length -1, str); kputc('\t', str); //ssend
     } else {
+        kputs("*\t*\t*\t", str);
         kputs("*\t*\t*\t*\t", str);
     }
     kputs("eValue\tbitScore\n", str);

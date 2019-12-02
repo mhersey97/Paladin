@@ -1122,8 +1122,10 @@ void mem_reg2sam(const mem_opt_t *opt, const bntseq_t *bns, const uint8_t *pac, 
 	}
     if(opt->flag & MEM_F_BLAST){
         s->blast = str.s;
+        s->sam = 0;
     } else {
         s->sam = str.s;
+        s->blast = 0;
     }
 	if (XA) {
 		for (k = 0; k < a->n; ++k) free(XA[k]);
