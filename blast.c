@@ -49,16 +49,15 @@ void mem_aln2blast(const mem_opt_t *opt, const bntseq_t *bns, kstring_t *str, bs
     int soft_clips = 0; //soft clips sum used to calculate length
     int left_clips = 0;
     int query_length = s->l_seq;
-    int length = query_length - soft_clips;
     if(p->rid >= 0) { // with coordinate
         if (p->n_cigar) { // aligned
 			for (i = 0; i < p->n_cigar; ++i) {
 				int c = p->cigar[i]&0xf;
 				if (!(opt->flag&MEM_F_SOFTCLIP) && !p->is_alt && (c == 3 || c == 4))
 					c = which? 4 : 3; // use hard clipping for supplementary alignments
-                if( c == 1 || c == 2)
+                if( c == 1 || c == 2) //I or D
                     gap_count++;
-                if( c == 3 ) {
+                if( c == 3 ) { //S
                     soft_clips+= p->cigar[i]>>4;
                 }
                 if( i == 0 && c == 3){
@@ -66,6 +65,7 @@ void mem_aln2blast(const mem_opt_t *opt, const bntseq_t *bns, kstring_t *str, bs
                 }
 			}
 		}
+        int length = query_length - soft_clips;
         kputw( length , str); kputc('\t', str);//length
         kputs("mismatch\t", str);
         kputw(gap_count, str); kputc('\t', str); //gapopen
