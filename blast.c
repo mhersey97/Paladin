@@ -70,7 +70,8 @@ void mem_aln2blast(const mem_opt_t *opt, const bntseq_t *bns, kstring_t *str, bs
         kputs("mismatch\t", str);
         kputw(gap_count, str); kputc('\t', str); //gapopen
         kputw( left_clips, str); kputc('\t', str); //qStart
-        kputw( (query_length + left_clips) * 3, str); kputc('\t', str); //qEnd uses nucleotide length
+        //kputw( (query_length + left_clips) * 3, str); kputc('\t', str); //qEnd uses nucleotide length
+        kputw( (length) * 3, str); kputc('\t', str); 
         long sstart = p->pos + 1;
         kputl(sstart, str); kputc('\t', str); //sstart
         kputl( sstart + length -1, str); kputc('\t', str); //ssend
