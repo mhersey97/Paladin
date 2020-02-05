@@ -67,7 +67,7 @@ void mem_aln2blast(const mem_opt_t *opt, const bntseq_t *bns, kstring_t *str, bs
 		}
         int length = query_length - soft_clips;
         kputw( length , str); kputc('\t', str);//length
-        kputs("mismatch\t", str);
+        kputw( m->NM, str); kputc('\t', str);//mismatch
         kputw(gap_count, str); kputc('\t', str); //gapopen
         kputw( left_clips, str); kputc('\t', str); //qStart
         kputw( (length * 3) + left_clips, str); kputc('\t', str); //qEnd uses nucleotide length
