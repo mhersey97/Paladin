@@ -66,9 +66,16 @@ void mem_aln2blast(const mem_opt_t *opt, const bntseq_t *bns, kstring_t *str, bs
 			}
 		}
         int length = query_length - soft_clips;
+        double ident = 100 * ((double) ((double)(length - p->NM) / length));
+        kputw( ident, str);
+        if (ident != 100) {
+            kputc('.', str);
+            kputw(1000 * (ident - (int) ident), str);
+        }
+        kputc('\t', str); //% identical
         kputw( length , str); kputc('\t', str);//length
-        kputw( m->NM, str); kputc('\t', str);//mismatch
-        kputw(gap_count, str); kputc('\t', str); //gapopen
+        kputw( p->NM, str); kputc('\t', str);//mismatch
+        kputw( gap_count, str); kputc('\t', str); //gapopen
         kputw( left_clips, str); kputc('\t', str); //qStart
         kputw( (length * 3) + left_clips, str); kputc('\t', str); //qEnd uses nucleotide length
         long sstart = p->pos + 1;
