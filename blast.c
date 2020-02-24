@@ -44,7 +44,7 @@ void mem_aln2blast(const mem_opt_t *opt, const bntseq_t *bns, kstring_t *str, bs
     } else {
         kputs("*\t", str);
     }
-    kputs("pIdent\t", str);
+
     int gap_count = 0; //gapopen = count of I and D in CIGAR string
     int soft_clips = 0; //soft clips sum used to calculate length
     int left_clips = 0;
