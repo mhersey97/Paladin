@@ -4,6 +4,7 @@
 #include <curl/curl.h>
 #include <unistd.h>
 #include <zlib.h>
+#include <math.h>
 #include "blast.h"
 
 void renderBLASTReport(FILE * passStream, const char * passProxy) {
@@ -38,18 +39,14 @@ void mem_aln2blast(const mem_opt_t *opt, const bntseq_t *bns, kstring_t *str, bs
 
     l_name = strlen(s->name);
 	ks_resize(str, str->l + s->l_seq + l_name + (s->qual? s->l_seq : 0) + 20);
-	kputs(qseqid(s->name), str); kputc('\t', str); // qseqid
-    if (p->rid >= 0) { // with coordinate
-        kputs(bns->anns[p->rid].name, str); kputc('\t', str); // sseqid
-    } else {
-        kputs("*\t", str);
-    }
 
     int gap_count = 0; //gapopen = count of I and D in CIGAR string
     int soft_clips = 0; //soft clips sum used to calculate length
     int left_clips = 0;
     int query_length = s->l_seq;
     if(p->rid >= 0) { // with coordinate
+        kputs(qseqid(s->name), str); kputc('\t', str); // qseqid
+        kputs(bns->anns[p->rid].name, str); kputc('\t', str); // sseqid
         if (p->n_cigar) { // aligned
 			for (i = 0; i < p->n_cigar; ++i) {
 				int c = p->cigar[i]&0xf;
@@ -81,11 +78,16 @@ void mem_aln2blast(const mem_opt_t *opt, const bntseq_t *bns, kstring_t *str, bs
         long sstart = p->pos + 1;
         kputl(sstart, str); kputc('\t', str); //sstart
         kputl( sstart + length -1, str); kputc('\t', str); //ssend
-    } else {
-        kputs("*\t*\t*\t", str);
-        kputs("*\t*\t*\t*\t", str);
-    }
-    kputs("eValue\tbitScore\n", str);
+
+        //calculate bitscore
+        double lambda = calcLambda(opt->a, opt->b);
+        double k = calcK( opt->a, opt->b);
+        double bitScore = ( (lambda * p->score) - log(k))/( log(2));
+        kputs("eValue\t", str);
+        kputw( bitScore, str);
+        kputc('.', str);
+        kputw(1000 * (bitScore - (int) bitScore), str); kputc('\n', str);
+    } 
 
 }
 
@@ -107,4 +109,172 @@ char* qseqid( char* name) {
         dest[i] = name[i+trim+1];
     }
     return dest;
+}
+
+double calcLambda( int a, int b) {
+    if( a> 12 || b > a || a < 5){
+        return 0.318;
+    } else if( a == 12) {
+        if( b >= 3 ) {
+            return 0.305;
+        } else if( b == 2 ) {
+            return 0.300;
+        } else {
+            return 0.275;
+        }
+    } else if( a == 11 ) {
+        if( b >= 3 ){
+            return 0.301;
+        } else if ( b == 2) {
+            return 0.286;
+        } else {
+            return 0.255;
+        }
+    } else if ( a == 10 ) {
+        if( b >= 4 ) {
+            return 0.293;
+        } else if ( b == 3) {
+            return 0.281;
+        } else if ( b == 2 ) {
+            return 0.266;
+        } else {
+            return 0.216;
+        }
+    } else if ( a == 9 ) {
+        if( b >= 5 ) {
+            return 0.286;
+        } else if ( b == 3 || b == 4) {
+            return 0.273;
+        } else if ( b == 2 ) {
+            return 0.244;
+        } else {
+            return 0.176;
+        }
+    } else if (a == 8 ) {
+        if ( b == 7 || b == 8) {
+            return 0.270;
+        } else if (b >= 4 || b <= 6 ) {
+            return 0.262;
+        } else if ( b == 3 ) {
+            return 0.243;
+        } else if ( b == 2 ) {
+            return 0.215;
+        } else {
+            return 1.0;
+        }
+    } else if ( a == 7 ) {
+        if ( b == 6 || b == 7 ) {
+            return 0.247;
+        } else if ( b == 4 || b == 5 ) {
+            return 0.230;
+        } else if ( b == 3 ) {
+            return 0.208;
+        } else if ( b == 2 ) {
+            return 0.164;
+        } else {
+            return 1.0;
+        }
+    } else if ( a == 6 ) {
+        if ( b == 5 || b == 6 ) {
+            return 0.200;
+        } else if ( b == 4 ) {
+            return 0.179;
+        } else if ( b == 3 ) {
+            return 0.153;
+        } else {
+            return 1.00;
+        }
+    } else if ( a == 5 ) {
+        if ( b == 5 ) {
+            return 0.131;
+        } else {
+            return 1.00;
+        }
+    } else {
+        return 1.00;
+    }
+}
+
+double calcK(int a, int b){
+    if( a> 12 || b > a || a < 5){
+        return 0.13;
+    } else if( a == 12) {
+        if( b >= 3 ) {
+            return 0.10;
+        } else if( b == 2 ) {
+            return 0.09;
+        } else {
+            return 0.05;
+        }
+    } else if( a == 11 ) {
+        if( b >= 3 ){
+            return 0.09;
+        } else if ( b == 2) {
+            return 0.07;
+        } else {
+            return 0.0355;
+        }
+    } else if ( a == 10 ) {
+        if( b >= 4 ) {
+            return 0.08;
+        } else if ( b == 3) {
+            return 0.06;
+        } else if ( b == 2 ) {
+            return 0.04;
+        } else {
+            return 0.014;
+        }
+    } else if ( a == 9 ) {
+        if( b >= 5 ) {
+            return 0.08;
+        } else if ( b == 3 || b == 4) {
+            return 0.06;
+        } else if ( b == 2 ) {
+            return 0.030;
+        } else {
+            return 0.008;
+        }
+    } else if (a == 8 ) {
+        if ( b == 7 || b == 8) {
+            return 0.06;
+        } else if (b >= 4 || b <= 6 ) {
+            return 0.05;
+        } else if ( b == 3 ) {
+            return 0.035;
+        } else if ( b == 2 ) {
+            return 0.021;
+        } else {
+            return 1.0;
+        }
+    } else if ( a == 7 ) {
+        if ( b == 6 || b == 7 ) {
+            return 0.05;
+        } else if ( b == 4 || b == 5 ) {
+            return 0.030;
+        } else if ( b == 3 ) {
+            return 0.021;
+        } else if ( b == 2 ) {
+            return 0.009;
+        } else {
+            return 1.0;
+        }
+    } else if ( a == 6 ) {
+        if ( b == 5 || b == 6 ) {
+            return 0.021;
+        } else if ( b == 4 ) {
+            return 0.014;
+        } else if ( b == 3 ) {
+            return 0.010;
+        } else {
+            return 1.00;
+        }
+    } else if ( a == 5 ) {
+        if ( b == 5 ) {
+            return 0.009;
+        } else {
+            return 1.00;
+        }
+    } else {
+        return 1.00;
+    }
 }
