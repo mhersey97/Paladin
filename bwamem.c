@@ -17,6 +17,7 @@
 #include "utils.h"
 #include "protein.h"
 #include "uniprot.h"
+#include "blast.h"
 
 #ifdef USE_MALLOC_WRAPPERS
 #  include "malloc_wrap.h"
@@ -177,7 +178,7 @@ static smem_aux_t *smem_aux_init()
 }
 
 static void smem_aux_destroy(smem_aux_t *a)
-{	
+{
 	free(a->tmpv[0]->a); free(a->tmpv[0]);
 	free(a->tmpv[1]->a); free(a->tmpv[1]);
 	free(a->mem.a); free(a->mem1.a);
@@ -1103,15 +1104,29 @@ void mem_reg2sam(const mem_opt_t *opt, const bntseq_t *bns, const uint8_t *pac, 
 		mem_aln_t t;
 		t = mem_reg2aln(opt, bns, pac, s->l_seq, s->seq, 0);
 		t.flag |= extra_flag;
-		mem_aln2sam(opt, bns, &str, s, 1, &t, 0, m);
+        if(opt->flag & MEM_F_BLAST){
+            mem_aln2blast(opt, bns, &str, s, 1, &t, 0, m);
+        } else {
+		    mem_aln2sam(opt, bns, &str, s, 1, &t, 0, m);
+        }
 	} else {
 		for (k = 0; k < aa.n; ++k) {
-			mem_aln2sam(opt, bns, &str, s, aa.n, aa.a, k, m);
+            if(opt->flag & MEM_F_BLAST){
+                mem_aln2blast(opt, bns, &str, s, aa.n, aa.a, k, m);
+            } else {
+			    mem_aln2sam(opt, bns, &str, s, aa.n, aa.a, k, m);
+            }
 		}
 		for (k = 0; k < aa.n; ++k) free(aa.a[k].cigar);
 		free(aa.a);
 	}
-	s->sam = str.s;
+    if(opt->flag & MEM_F_BLAST){
+        s->blast = str.s;
+        s->sam = 0;
+    } else {
+        s->sam = str.s;
+        s->blast = 0;
+    }
 	if (XA) {
 		for (k = 0; k < a->n; ++k) free(XA[k]);
 		free(XA);

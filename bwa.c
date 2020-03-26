@@ -176,11 +176,11 @@ uint32_t *bwa_gen_cigar2(const int8_t mat[VALUE_SCORING], int o_del, int e_del, 
 			op  = cigar[k]&0xf, len = cigar[k]>>4;
 			if (op == 0) { // match
 				for (i = 0; i < len; ++i) {
-					if (query[x + i] != rseq[y + i]) {
+					if (query[x + i] != rseq[y + i]) { // mismatch n_nm
 						kputw(u, &str);
 						kputc(int2base[rseq[y+i]], &str);
 						++n_mm; u = 0;
-					} else ++u;
+					} else ++u; // currrently counts matchs but resets after a mismatch (make variable and add to aln)
 				}
 				x += len; y += len;
 			} else if (op == 2) { // deletion

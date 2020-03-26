@@ -24,7 +24,7 @@ typedef struct {
 
 typedef struct {
 	int l_seq, id;
-	char *name, *comment, *seq, *qual, *sam;
+	char *name, *comment, *seq, *qual, *sam, *blast;
 } bseq1_t;
 
 extern int bwa_verbose;
