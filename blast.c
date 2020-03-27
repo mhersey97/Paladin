@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 #include <errno.h>
 #include <curl/curl.h>
@@ -79,11 +80,14 @@ void mem_aln2blast(const mem_opt_t *opt, const bntseq_t *bns, kstring_t *str, bs
         kputl(sstart, str); kputc('\t', str); //sstart
         kputl( sstart + length -1, str); kputc('\t', str); //ssend
 
-        //calculate bitscore
+        //calculate bitscore and e-value
         double lambda = calcLambda(opt->a, opt->b);
         double k = calcK( opt->a, opt->b);
         double bitScore = ( (lambda * p->score) - log(k))/( log(2));
-        kputs("eValue\t", str);
+	double eval = (length * opt->l)/(pow(2,bitScore));
+	char * out = malloc(5);
+	sprintf(out, "%5.2e", eval);
+        kputs( out, str); kputc('\t', str);
         kputw( bitScore, str);
         kputc('.', str);
         kputw(1000 * (bitScore - (int) bitScore), str); kputc('\n', str);

@@ -67,7 +67,7 @@ typedef struct {
 	int max_ins;            // when estimating insert size distribution, skip pairs with insert longer than this value
 	int max_matesw;         // perform maximally max_matesw rounds of mate-SW for each end
 	int max_XA_hits, max_XA_hits_alt; // if there are max_hits or fewer, output them all
-
+	int64_t l;
 	int8_t mat[VALUE_SCORING];         // scoring matrix; mat[0] == 0 if unset
 } mem_opt_t;
 

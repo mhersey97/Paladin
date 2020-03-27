@@ -332,6 +332,9 @@ int command_align(int argc, char *argv[]) {
 
 	// Load index
 	aux.idx = index_load_from_shm(argv[optind]);
+	char * pacName = malloc(strlen(argv[optind]));
+	sprintf(pacName, "%s.pac", argv[optind]);
+	opt->l = bwa_seq_len(pacName);
 	if (aux.idx == 0) {
 		logMessage(__func__, LOG_LEVEL_MESSAGE, "Loading the index for reference '%s'...\n", argv[optind]);
 		if ((aux.idx = index_load(argv[optind], BWA_IDX_ALL)) == 0) return 1; // FIXME: memory leak
