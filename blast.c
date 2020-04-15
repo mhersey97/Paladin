@@ -81,17 +81,18 @@ void mem_aln2blast(const mem_opt_t *opt, const bntseq_t *bns, kstring_t *str, bs
         kputl( sstart + length -1, str); kputc('\t', str); //ssend
 
         //calculate bitscore and e-value
-        double lambda = calcLambda(opt->a, opt->b);
-        double k = calcK( opt->a, opt->b);
-        double bitScore = ( (lambda * p->score) - log(k))/( log(2));
-	double eval = (length * opt->l)/(pow(2,bitScore));
-	char * out = malloc(5);
-	sprintf(out, "%5.2e", eval);
+        double lambda = calcLambda(opt->e_del, opt->o_del);
+        double k = calcK( opt->e_del, opt->o_del);
+        double bitScore = ( (lambda * (p->score *5.4)) - log(k))/( log(2));
+	    double eval = (length * opt->l)/(pow(2,bitScore));
+	    char * out = malloc(5);
+	    sprintf(out, "%5.2e", eval);
         kputs( out, str); kputc('\t', str);
-        kputw( bitScore, str);
-        kputc('.', str);
-        kputw(1000 * (bitScore - (int) bitScore), str); kputc('\n', str);
-    } 
+        sprintf(out, "%0.2f", bitScore);
+        kputs( out, str);//kputc('\n', str);
+        kputc('\n', str);
+        free(out);
+    }
 
 }
 
@@ -116,7 +117,7 @@ char* qseqid( char* name) {
 }
 
 double calcLambda( int a, int b) {
-    if( a> 12 || b > a || a < 5){
+    if( a> 12 || b > a ){
         return 0.318;
     } else if( a == 12) {
         if( b >= 3 ) {
@@ -186,7 +187,7 @@ double calcLambda( int a, int b) {
         } else if ( b == 3 ) {
             return 0.153;
         } else {
-            return 1.00;
+            return 0.269;
         }
     } else if ( a == 5 ) {
         if ( b == 5 ) {
@@ -200,7 +201,7 @@ double calcLambda( int a, int b) {
 }
 
 double calcK(int a, int b){
-    if( a> 12 || b > a || a < 5){
+    if( a> 12 || b > a ){
         return 0.13;
     } else if( a == 12) {
         if( b >= 3 ) {
@@ -270,7 +271,7 @@ double calcK(int a, int b){
         } else if ( b == 3 ) {
             return 0.010;
         } else {
-            return 1.00;
+            return 0.079;
         }
     } else if ( a == 5 ) {
         if ( b == 5 ) {
